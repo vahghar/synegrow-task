@@ -9,9 +9,12 @@ const PORT = 3000;
 const swaggerDoc = YAML.load('./swagger.yaml')
 
 app.use(express.json());
+
 app.use('/api', taskRoutes);
 app.use('/docs', serve, setup(swaggerDoc));
-
+app.use('/', (req, res) => {
+    res.send('Welcome to Synegrow Task');
+});
 app.listen(PORT, () => {
     console.log(`Server is running on port ${PORT}`);
 });

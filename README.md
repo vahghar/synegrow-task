@@ -4,7 +4,7 @@ A simple in-memory task management API
 
 ### 1. **Clone the repository**
 ```bash
-git clone https://github.com/your-username/task-manager-api.git
+git clone [https://github.com/your-username/task-manager-api.git](https://github.com/vahghar/synegrow-task.git)
 cd task-manager-api
 ```
 

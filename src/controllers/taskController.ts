@@ -1,7 +1,7 @@
 import { Task, tasks } from '../models/taskModel';
 import { Request, Response } from 'express';
 import { v4 as uuidv4 } from 'uuid';
-import { taskSchema } from '../utils/validator';
+import { querySchema, taskSchema } from '../utils/validator';
 
 export const createTask = (req: Request, res: Response) => {
     const result = taskSchema.safeParse(req.body);
@@ -25,23 +25,27 @@ export const createTask = (req: Request, res: Response) => {
 }
 
 export const getAllTasks = (req: Request, res: Response) => {
-  const { q, status } = req.query;
-  const page = parseInt((req.query.page as string) || '1', 10);
-  const limit = parseInt((req.query.limit as string) || '10', 10);
+  const result = querySchema.safeParse(req.query);
+  if (!result.success) {
+    return res.status(400).json({ error: result.error.flatten() });
+  }
+
+  const { q, status, page = 1, limit = 10 } = result.data;
 
   let filteredTasks = tasks;
 
-  if (status && typeof status === 'string') {
+  if (status) {
     filteredTasks = filteredTasks.filter(task => task.status === status);
   }
 
-  if (q && typeof q === 'string') {
+  if (q) {
     const lowerQ = q.toLowerCase();
     filteredTasks = filteredTasks.filter(task =>
       task.title.toLowerCase().includes(lowerQ) ||
       task.description.toLowerCase().includes(lowerQ)
     );
   }
+  
   const total = filteredTasks.length;
   const totalPages = Math.ceil(total/limit);
   const start = (page - 1) * limit;
@@ -85,5 +89,5 @@ export const deleteTaskById = (req: Request, res: Response) => {
   if (index === -1) return res.status(404).json({ error: 'Task not found' });
 
   tasks.splice(index, 1);
-  res.status(204).send();
+  res.status(200).json({ success: true });
 };
